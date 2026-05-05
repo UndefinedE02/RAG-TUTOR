@@ -1,0 +1,66 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Environments (Sangat Penting)
+.env
+.envrc
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Streamlit Specific
+.streamlit/secrets.toml
+.streamlit/config.toml
+
+# Databases (Data Lokal Proyek)[cite: 2]
+chroma_db/
+*.db
+*.sqlite
+*.sqlite3
+*.sqlite3-journal
+
+# AI Models (Lokal)[cite: 2]
+models/e5-small/
+
+# Unit test / coverage reports
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editor Specific (VS Code, PyCharm, Cursor)
+.vscode/
+.idea/
+.cursorignore
+.cursorindexingignore
+
+# OS generated files
+.DS_Store
+Thumbs.db
