@@ -1,4 +1,4 @@
-# AI Tutor UTBK/SNBT
+# AI Tutor
 
 Aplikasi tutor pribadi berbasis AI untuk persiapan **UTBK/SNBT** yang dibangun di atas arsitektur **RAG (Retrieval-Augmented Generation)**. Sistem ini mengkombinasikan vector database lokal dengan model LLM Gemini untuk menghasilkan jawaban yang akurat, kontekstual, dan meminimalisir halusinasi.
 
