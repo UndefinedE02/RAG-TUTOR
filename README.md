@@ -1,10 +1,10 @@
-# 📚 AI Tutor UTBK/SNBT
+# AI Tutor UTBK/SNBT
 
 Aplikasi tutor pribadi berbasis AI untuk persiapan **UTBK/SNBT** yang dibangun di atas arsitektur **RAG (Retrieval-Augmented Generation)**. Sistem ini mengkombinasikan vector database lokal dengan model LLM Gemini untuk menghasilkan jawaban yang akurat, kontekstual, dan meminimalisir halusinasi.
 
 ---
 
-## ✨ Fitur Utama
+## Fitur Utama
 
 | Fitur | Deskripsi |
 |---|---|
@@ -18,7 +18,7 @@ Aplikasi tutor pribadi berbasis AI untuk persiapan **UTBK/SNBT** yang dibangun d
 
 ---
 
-## 🏗️ Arsitektur
+## Arsitektur
 
 ```
 PDF Materi
@@ -45,7 +45,7 @@ PDF Materi
 
 ---
 
-## 📂 Struktur Folder
+## Struktur Folder
 
 ```
 AiTutor/
@@ -73,7 +73,7 @@ AiTutor/
 
 ---
 
-## ⚙️ Prasyarat
+## Prasyarat
 
 - Python **3.10+**
 - Koneksi internet (Gemini API)
@@ -82,7 +82,7 @@ AiTutor/
 
 ---
 
-## 🚀 Instalasi
+## Instalasi
 
 ### 1. Clone repository
 ```bash
@@ -146,7 +146,7 @@ create table chat_history (
 
 ---
 
-## ▶️ Menjalankan Aplikasi
+## Menjalankan Aplikasi
 
 ### Langkah 1 — Parsing PDF
 ```bash
@@ -172,7 +172,7 @@ python main.py
 
 ---
 
-## 🔍 Utilitas Database
+## Utilitas Database
 
 ```bash
 # Cek jumlah chunk per subtest dan kondisi database
@@ -184,7 +184,7 @@ python src/retrieval/rtl.py
 
 ---
 
-## 📖 Subtest yang Didukung
+## Subtest yang Didukung
 
 | Kode | Nama |
 |---|---|
@@ -198,7 +198,7 @@ python src/retrieval/rtl.py
 
 ---
 
-## 📝 Catatan Penting
+## Catatan Penting
 
 - PDF hasil scan (gambar) tidak dapat diproses — gunakan PDF dengan teks yang bisa di-select
 - Nama file PDF harus mengandung kode subtest agar pipeline ingestion mendeteksi dengan benar
@@ -207,6 +207,6 @@ python src/retrieval/rtl.py
 
 ---
 
-## 📄 Lisensi
+## Lisensi
 
 Project ini dibuat untuk keperluan edukasi. Penggunaan ulang dan modifikasi diperbolehkan dengan menyertakan kredit.
