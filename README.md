@@ -18,33 +18,6 @@ Aplikasi tutor pribadi berbasis AI untuk persiapan **UTBK/SNBT** yang dibangun d
 
 ---
 
-## Arsitektur
-
-```
-PDF Materi
-    │
-    ├── igs.py          → Parsing & chunking teks
-    │
-    └── emd.py          → Embedding → ChromaDB (Vector DB)
-                                │
-                    User Input (Streamlit UI)
-                                │
-                        retrieve_context()
-                        (Similarity Search + Shuffle)
-                                │
-                          build_prompt()
-                          (Konteks + Riwayat + Instruksi)
-                                │
-                          ask_gemini()
-                          (Rotasi Key + Backoff)
-                                │
-                           Jawaban / Soal
-                                │
-                           Supabase (Simpan Riwayat)
-```
-
----
-
 ## Struktur Folder
 
 ```
