@@ -1,6 +1,5 @@
 import sys
 import os
-import time
 import uuid
 import random
 import streamlit as st
@@ -119,6 +118,10 @@ Pertanyaan Siswa: {user_query}
 # Inisialisasi Resource
 @st.cache_resource
 def _init_collection():
+    # Set cache dir agar model tidak re-download tiap cold start di Streamlit Cloud
+    cache_dir = os.getenv("SENTENCE_TRANSFORMERS_HOME", str(BASE_DIR / "models" / "st_cache"))
+    os.environ.setdefault("SENTENCE_TRANSFORMERS_HOME", cache_dir)
+
     model_folder = BASE_DIR / "models" / "e5-small"
     model_id = str(model_folder) if model_folder.exists() else "intfloat/multilingual-e5-small"
     ef = embedding_functions.SentenceTransformerEmbeddingFunction(model_name=model_id)
@@ -137,12 +140,13 @@ def init_resources():
     collection, embed_source = _init_collection()
     return gemini_clients, collection, embed_source
 
-# Retrieval Logic (Randomized & Context Aware)
+# ── Retrieval Logic (Randomized & Context Aware) ──────────────────────────────
 def retrieve_context(collection, query: str, subtest_filter=None) -> str:
     # 1. Deteksi referensi riwayat (Context Aware)
     history_ref = ["chat diatas", "tadi", "sebelumnya", "soal itu", "materi yang sama"]
     if any(ref in query.lower() for ref in history_ref):
         last_msgs = [m["content"] for m in st.session_state.messages if m["role"] == "user"]
+        # Gunakan index -2 karena index -1 adalah input user yang baru saja disubmit
         if len(last_msgs) > 1:
             query_sebelumnya = last_msgs[-2]
             query = f"{query_sebelumnya} {query}"
@@ -152,8 +156,15 @@ def retrieve_context(collection, query: str, subtest_filter=None) -> str:
     target_n = 2 if is_literasi else 3
     
     # 3. Strategi Shuffle
-    sample_size = target_n * 4 
+    sample_size = target_n * 4
     where_clause = {"subtest": subtest_filter} if subtest_filter else None
+
+    # Clamp sample_size agar tidak melebihi jumlah dokumen yang tersedia di collection
+    try:
+        total_docs = collection.count()
+        sample_size = min(sample_size, max(total_docs, 1))
+    except Exception:
+        pass  # Biarkan query berjalan dengan sample_size asli jika count gagal
     
     try:
         results = collection.query(
@@ -190,10 +201,12 @@ def ask_gemini(clients, prompt):
             except Exception as e:
                 err = str(e).lower()
                 if "429" in err or "quota" in err or "exhausted" in err:
-                    break # Langsung lompat ke API Key berikutnya
-                if "400" in err or "403" in err:
-                    break
-                continue # Coba model berikutnya jika error biasa
+                    break  # Quota habis → langsung lompat ke API Key berikutnya
+                if "400" in err or "404" in err:
+                    continue  # Model tidak valid → coba model berikutnya di key yang sama
+                if "403" in err:
+                    break  # Unauthorized → lompat ke API Key berikutnya
+                continue  # Error lain → coba model berikutnya
                 
     return "⚠️ Semua API Key Limit atau tidak tersedia."
 
@@ -209,7 +222,7 @@ def build_prompt(mode, phase, context, history, user_input, soal_aktif):
     else:
         instruksi = "Jawab pertanyaan siswa secara ringkas."
 
-    # MENGGUNAKAN LATEX {aligned} PENTING UNTUK RUMUS MATEMATIKA
+    # MENGGUNAKAN REPLACE AGAR TIDAK ERROR DENGAN LATEX {aligned}
     filled_prompt = SYSTEM_PROMPT.replace("{context}", context if context else "N/A").replace("{user_query}", user_input)
     
     return f"{filled_prompt}\n\n[RIWAYAT]\n{history_text}\n\n[PERINTAH]\n{instruksi}"
@@ -235,7 +248,15 @@ def main():
 
     with st.sidebar:
         st.title("📚 AI Tutor")
-        mode = st.radio("Mode", ["Chat Materi", "Latihan Soal"])
+        mode = st.radio("Mode", ["Chat Materi", "Latihan Soal"],
+                        index=["Chat Materi", "Latihan Soal"].index(
+                            st.session_state.get("mode", "Chat Materi")
+                        ))
+        # Simpan mode ke session_state; reset phase jika mode berpindah
+        if st.session_state.get("mode") != mode:
+            st.session_state.mode = mode
+            st.session_state.latihan_phase = "generate"
+            st.session_state.soal_aktif = None
         sub_idx = st.selectbox("Subtest", range(len(SUBTEST_NAMES)+1), 
                                format_func=lambda i: (["Semua"]+list(SUBTEST_NAMES.keys()))[i])
         sub_filter = (["None"]+list(SUBTEST_NAMES.keys()))[sub_idx]
